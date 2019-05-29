@@ -17,16 +17,18 @@ namespace HDDLED
     public partial class InvisibleForm : Form
     {
         #region Global Variables
+        Random random;
         NotifyIcon hddLedNotifyIcon;
         Icon activeIcon;
         Icon idleIcon;
         Thread hddLedThread;
-        Random random;
         #endregion
 
         public InvisibleForm()
         {
             InitializeComponent();
+
+            random = new Random();
 
             // Load the .ico files into the Icons
             activeIcon = new Icon("Hard_Disk_Icon_Red.ico");
@@ -45,7 +47,8 @@ namespace HDDLED
             contextMenu.MenuItems.Add(quitMenuItem);
             hddLedNotifyIcon.ContextMenu = contextMenu;
 
-            // Wire up quit button to close application
+            // Wire up the menu items
+            progNameMenuItem.Click += ProgNameMenuItem_Click;
             quitMenuItem.Click += QuitMenuItem_Click;
 
             // Hide the form, don't need a window
@@ -55,6 +58,14 @@ namespace HDDLED
             // Start worker thread
             hddLedThread = new Thread(new ThreadStart(HddActivityThread));
             hddLedThread.Start();
+        }
+
+        private void ProgNameMenuItem_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("HDD LED v0.1\n\rby Stephen Wood",
+                "About",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
         }
 
         private void QuitMenuItem_Click(object sender, EventArgs e)
@@ -79,7 +90,10 @@ namespace HDDLED
                         {
                             if (Convert.ToUInt64(obj["DiskBytesPerSec"]) > 0)
                             {
-                                hddLedNotifyIcon.Icon = activeIcon;
+                                if (random.Next(100) > 50)
+                                    hddLedNotifyIcon.Icon = activeIcon;
+                                else
+                                    hddLedNotifyIcon.Icon = idleIcon;
                             }
                             else
                             {
