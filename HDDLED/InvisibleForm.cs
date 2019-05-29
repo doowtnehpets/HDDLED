@@ -90,10 +90,13 @@ namespace HDDLED
                         {
                             if (Convert.ToUInt64(obj["DiskBytesPerSec"]) > 0)
                             {
-                                if (random.Next(100) > 50)
+                                for(int i=0; i<10; i++)
+                                {
                                     hddLedNotifyIcon.Icon = activeIcon;
-                                else
+                                    Thread.Sleep(60);
                                     hddLedNotifyIcon.Icon = idleIcon;
+                                    Thread.Sleep(60);
+                                }
                             }
                             else
                             {
