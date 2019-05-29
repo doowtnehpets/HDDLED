@@ -1,15 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Management;
-using System.Management.Instrumentation;
-using System.Collections.Specialized;
 using System.Threading;
 
 namespace HDDLED
@@ -17,18 +9,17 @@ namespace HDDLED
     public partial class InvisibleForm : Form
     {
         #region Global Variables
-        Random random;
         NotifyIcon hddLedNotifyIcon;
         Icon activeIcon;
         Icon idleIcon;
         Thread hddLedThread;
+        AboutForm aboutForm;
         #endregion
 
+        #region Main Function
         public InvisibleForm()
         {
             InitializeComponent();
-
-            random = new Random();
 
             // Load the .ico files into the Icons
             activeIcon = new Icon("Hard_Disk_Icon_Red.ico");
@@ -38,9 +29,10 @@ namespace HDDLED
             hddLedNotifyIcon = new NotifyIcon();
             hddLedNotifyIcon.Icon = idleIcon;
             hddLedNotifyIcon.Visible = true;
+            hddLedNotifyIcon.Text = "HDD LED v0.1";
 
             // Set up the context menu for the icon
-            MenuItem progNameMenuItem = new MenuItem("HDD LED v0.1");
+            MenuItem progNameMenuItem = new MenuItem("About");
             MenuItem quitMenuItem = new MenuItem("Quit");
             ContextMenu contextMenu = new ContextMenu();
             contextMenu.MenuItems.Add(progNameMenuItem);
@@ -59,38 +51,44 @@ namespace HDDLED
             hddLedThread = new Thread(new ThreadStart(HddActivityThread));
             hddLedThread.Start();
         }
+        #endregion
 
+        #region Event handlers
         private void ProgNameMenuItem_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("HDD LED v0.1\n\rby Stephen Wood",
-                "About",
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Information);
+            // If the AboutForm hasn't been created or is already disposed, create a new one
+            if (aboutForm == null || aboutForm.IsDisposed)
+                aboutForm = new AboutForm();
+            aboutForm.Show();
         }
 
         private void QuitMenuItem_Click(object sender, EventArgs e)
         {
+            // Clean up and close out program
             hddLedThread.Abort();
             hddLedNotifyIcon.Dispose();
             this.Close();
         }
+        #endregion
 
+        #region Threads
         public void HddActivityThread()
         {
             try
             {
                 ManagementClass driveDataClass = new ManagementClass("Win32_PerfFormattedData_PerfDisk_PhysicalDisk");
+                ManagementObjectCollection driveDataClassCollection;
 
                 while (true)
                 {
-                    ManagementObjectCollection driveDataClassCollection = driveDataClass.GetInstances();
+                    driveDataClassCollection = driveDataClass.GetInstances();
                     foreach(ManagementObject obj in driveDataClassCollection)
                     {
                         if(obj["Name"].ToString() == "_Total")
                         {
                             if (Convert.ToUInt64(obj["DiskBytesPerSec"]) > 0)
                             {
-                                for(int i=0; i<10; i++)
+                                for(int i=0; i<5; i++)
                                 {
                                     hddLedNotifyIcon.Icon = activeIcon;
                                     Thread.Sleep(60);
@@ -112,5 +110,6 @@ namespace HDDLED
 
             }
         }
+        #endregion
     }
 }
