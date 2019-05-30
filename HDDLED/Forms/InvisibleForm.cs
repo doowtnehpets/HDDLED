@@ -22,8 +22,8 @@ namespace HDDLED
             InitializeComponent();
 
             // Load the .ico files into the Icons
-            activeIcon = new Icon("Hard_Disk_Icon_Red.ico");
-            idleIcon = new Icon("Hard_Disk_Icon.ico");
+            activeIcon = Properties.Resources.Hard_Disk_Icon_Red;
+            idleIcon = Properties.Resources.Hard_Disk_Icon;
 
             // Create the notify icon and set the current icon as the idle icon
             hddLedNotifyIcon = new NotifyIcon();

@@ -18,5 +18,10 @@ namespace HDDLED
         {
             this.Dispose();
         }
+
+        private void PictureBox1_Click(object sender, System.EventArgs e)
+        {
+            this.Dispose();
+        }
     }
 }
