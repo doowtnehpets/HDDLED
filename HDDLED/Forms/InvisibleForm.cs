@@ -88,7 +88,7 @@ namespace HDDLED
                         {
                             if (Convert.ToUInt64(obj["DiskBytesPerSec"]) > 0)
                             {
-                                for(int i=0; i<5; i++)
+                                for(int i=0; i<4; i++)
                                 {
                                     hddLedNotifyIcon.Icon = activeIcon;
                                     Thread.Sleep(60);
